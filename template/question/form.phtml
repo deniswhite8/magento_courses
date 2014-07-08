@@ -1,0 +1,20 @@
+<form action="<?php echo $this->getSendUrl(); ?>" method="post" class="scaffold-form">
+	<label for="name" class="required"><em>*</em>Name</label>
+	<div class="input-box">
+		<input type="text" name="name" id="name" required>
+	</div>            
+	                      
+	<label for="email">Email Address</label>
+	<div class="input-box">
+		<input type="email" name="email" id="email">
+	</div>
+
+	<label for="text" class="required"><em>*</em>Text</label>
+	<div class="input-box">
+		<textarea name="text" id="" cols="30" rows="10" id="text" required></textarea>
+	</div>
+
+	<div class="input-box">
+		<button type="submit" class="button"><span><span>Submit</span></span></button>
+	</div>
+</form>

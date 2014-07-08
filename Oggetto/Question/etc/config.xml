@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<config>
+    <modules>
+        <Oggetto_Question>
+            <version>0.0.1</version>
+        </Oggetto_Question>
+    </modules>
+
+    <frontend>
+        <routers>
+            <question>
+                <use>standard</use>
+                <args>
+                    <module>Oggetto_Question</module>
+                    <frontName>question</frontName>
+                </args>
+            </question>
+        </routers>
+
+        <layout>
+            <updates>
+                <question>
+                      <file>question.xml</file>
+                </question>
+            </updates>
+        </layout>
+    </frontend>
+
+    <global>
+        <blocks>
+            <question>
+                <rewrite>
+                    <question>Oggetto_Question_Block_Form</question>
+                </rewrite>
+            </question>
+        </blocks>
+
+        <models>
+            <question>
+                <class>Oggetto_Question_Model</class>
+                <resourceModel>question_resource</resourceModel>
+            </question>
+
+            <question_resource>
+                <class>Oggetto_Question_Model_Resource</class>
+                <entities>
+                    <question>
+                        <table>question</table>
+                    </question>
+                </entities>
+            </question_resource>
+        </models>
+
+        <resources>
+            <question_setup>
+                <setup>
+                    <module>Oggetto_Question</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </question_setup>
+        </resources>
+    </global>
+</config>
