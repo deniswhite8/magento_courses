@@ -18,6 +18,16 @@
             </question>
         </routers>
 
+        <translate>
+            <modules>
+                <Oggetto_Question>
+                    <files>
+                        <default>Oggetto_Question.csv</default>
+                    </files>
+                </Oggetto_Question>
+            </modules>
+        </translate>
+
         <layout>
             <updates>
                 <question>
@@ -28,12 +38,23 @@
     </frontend>
 
     <global>
+        <helpers>
+            <oggetto_question>
+                <class>Oggetto_Question_Helper</class>
+            </oggetto_question>
+        </helpers>
+
         <blocks>
             <question>
                 <rewrite>
                     <question>Oggetto_Question_Block_Form</question>
                 </rewrite>
             </question>
+
+            <oggetto_question>
+                <class>Oggetto_Question_Block</class>
+            </oggetto_question>
+
         </blocks>
 
         <models>
@@ -63,4 +84,26 @@
             </question_setup>
         </resources>
     </global>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Oggetto_Question before="Mage_Adminhtml">Oggetto_Question_Adminhtml</Oggetto_Question>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <oggetto_question>
+                    <file>question.xml</file>
+                </oggetto_question>
+            </updates>
+        </layout>
+    </adminhtml>
 </config>

@@ -23,24 +23,43 @@
  */
 
 /**
- * Admin edit form
+ * Admin edit
  *
  * @category   Oggetto
  * @package    Oggetto_Question
- * @subpackage Model_Resource
+ * @subpackage Adminhtml
  * @author     Denis Belov <dbelov@oggettoweb.com>
  */
-class Oggetto_Question_Model_Resource_Question
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_Question_Block_Adminhtml_Question_Edit
+    extends Mage_Adminhtml_Block_Widget_Form_Container
 {
-
     /**
      * Constructor
      *
-     * @return Oggetto_Question_Model_Resource_Question
+     * @return Oggetto_Question_Block_Adminhtml_Question_Edit
      */
-    public function _construct()
+    public function __construct()
     {
-        $this->_init('question/question', 'question_id');
+        $this->_blockGroup = 'oggetto_question';
+        $this->_controller = 'adminhtml_question';
+
+        parent::__construct();
+
+        $this->_updateButton('save', 'label', $this->__('Save Question'));
+        $this->_updateButton('delete', 'label', $this->__('Delete Question'));
+    }
+
+    /**
+     * Get header text
+     *
+     * @return string
+     */
+    public function getHeaderText()
+    {
+        if (Mage::registry('oggetto_question')->getQuestionId()) {
+            return $this->__('Edit Question');
+        } else {
+            return $this->__('New Question');
+        }
     }
 }

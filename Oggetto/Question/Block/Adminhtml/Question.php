@@ -27,20 +27,21 @@
  *
  * @category   Oggetto
  * @package    Oggetto_Question
- * @subpackage Model_Resource
+ * @subpackage Adminhtml
  * @author     Denis Belov <dbelov@oggettoweb.com>
  */
-class Oggetto_Question_Model_Resource_Question
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_Question_Block_Adminhtml_Question extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
-
     /**
      * Constructor
      *
-     * @return Oggetto_Question_Model_Resource_Question
+     * @return Oggetto_Question_Block_Adminhtml_Question
      */
-    public function _construct()
+    public function __construct()
     {
-        $this->_init('question/question', 'question_id');
+        $this->_blockGroup = 'oggetto_question';
+        $this->_controller = 'adminhtml_question';
+        $this->_headerText = $this->__('Question');
+        parent::__construct();
     }
 }

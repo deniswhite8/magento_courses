@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<config>
+    <menu>
+        <customer>
+            <children>
+                <oggetto_question_question translate="title" module="oggetto_question">
+                    <title>Questions</title>
+                    <action>adminhtml/question</action>
+                </oggetto_question_question>
+            </children>
+        </customer>
+    </menu>
+
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <customers>
+                        <children>
+                            <oggetto_question_question>
+                                <title>Questions</title>
+                            </oggetto_question_question>
+                        </children>
+                    </customers>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

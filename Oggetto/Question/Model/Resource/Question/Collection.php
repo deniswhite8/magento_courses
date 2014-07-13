@@ -30,17 +30,16 @@
  * @subpackage Model_Resource
  * @author     Denis Belov <dbelov@oggettoweb.com>
  */
-class Oggetto_Question_Model_Resource_Question
-    extends Mage_Core_Model_Resource_Db_Abstract
+class Oggetto_Question_Model_Resource_Question_Collection
+    extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
-
     /**
      * Constructor
      *
-     * @return Oggetto_Question_Model_Resource_Question
+     * @return Oggetto_Question_Model_Resource_Question_Collection
      */
-    public function _construct()
+    protected function _construct()
     {
-        $this->_init('question/question', 'question_id');
+        $this->_init('question/question');
     }
 }
