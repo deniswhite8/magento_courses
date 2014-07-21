@@ -23,7 +23,7 @@
  */
 
 /**
- * Admin edit form
+ * Form block
  *
  * @category   Oggetto
  * @package    Oggetto_Question
