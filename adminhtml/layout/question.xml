@@ -5,4 +5,45 @@
             <block type="oggetto_question/adminhtml_question" name="oggetto_question_question" />
         </reference>
     </adminhtml_question_index>
+
+    <adminhtml_question_edit>
+        <reference name="content">
+            <block type="oggetto_question/adminhtml_question_edit" name="oggetto_question_edit" />
+        </reference>
+    </adminhtml_question_edit>
+
+
+
+
+    <add_order_grid_column_handle>
+        <reference name="sales_order.grid">
+            <action method="addColumnAfter">
+                <columnId>customer_telephone</columnId>
+                <arguments module="customer" translate="header">
+                    <header>Telephone</header>
+                    <index>customer_telephone</index>
+                    <type>text</type>
+                </arguments>
+                <after>shipping_name</after>
+            </action>
+
+            <action method="addColumnAfter">
+                <columnId>shipping_method</columnId>
+                <arguments module="order" translate="header">
+                    <header>Shipping method</header>
+                    <index>shipping_method</index>
+                    <type>text</type>
+                </arguments>
+                <after>customer_telephone</after>
+            </action>
+        </reference>
+    </add_order_grid_column_handle>
+
+    <adminhtml_sales_order_grid>
+        <update handle="add_order_grid_column_handle" />
+    </adminhtml_sales_order_grid>
+
+    <adminhtml_sales_order_index>
+        <update handle="add_order_grid_column_handle" />
+    </adminhtml_sales_order_index>
 </layout>

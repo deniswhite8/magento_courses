@@ -1,6 +1,6 @@
 <?php
 /**
- * Oggetto Web sales extension for Magento
+ * Oggetto question extension for Magento
  *
  * NOTICE OF LICENSE
  *
@@ -17,7 +17,7 @@
  * please refer to http://www.magentocommerce.com for more information.
  *
  * @category  Oggetto
- * @package   Oggetto_Sales
+ * @package   Oggetto_Question
  * @copyright Copyright (C) 2014, Oggetto Web (http://oggettoweb.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -26,6 +26,71 @@ $installer = $this;
 $installer->startSetup();
 
 try {
+    $orderTable = $this->getTable('sales/order_grid');
+    $this->getConnection()->addColumn(
+        $orderTable,
+        'customer_telephone',
+        array(
+            'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+            'length' => 255,
+            'nullable' => false,
+            'default' => '',
+            'comment' => 'Customer telephone'
+        )
+    );
+
+    $this->getConnection()->addColumn(
+        $orderTable,
+        'shipping_method',
+        array(
+            'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+            'length' => 255,
+            'nullable' => false,
+            'default' => '',
+            'comment' => 'Shipping method'
+        )
+    );
+
+    $this->getConnection()->addKey(
+        $orderTable,
+        'customer_telephone',
+        'customer_telephone'
+    );
+
+    $this->getConnection()->addKey(
+        $orderTable,
+        'shipping_method',
+        'shipping_method'
+    );
+
+
+    $select = $this->getConnection()->select();
+    $select->join(
+        array('address' => $this->getTable('sales/order_address')),
+        $this->getConnection()->quoteInto(
+            'address.parent_id = order_grid.entity_id AND address.address_type = ?',
+            Mage_Sales_Model_Quote_Address::TYPE_BILLING
+        ),
+        array('customer_telephone' => 'telephone')
+    );
+
+    $select->join(
+        array('order' => $this->getTable('sales/order')),
+        $this->getConnection()->quoteInto(
+            'order.entity_id = order_grid.entity_id',
+            Mage_Sales_Model_Quote_Address::TYPE_BILLING
+        ),
+        array('shipping_method' => 'shipping_method')
+    );
+
+    $this->getConnection()->query(
+        $select->crossUpdateFromSelect(
+            array('order_grid' => $this->getTable('sales/order_grid'))
+        )
+    );
+
+
+
     $table = $installer
         ->getConnection()
         ->newTable($installer->getTable('question/question'))
@@ -65,10 +130,16 @@ try {
             ), 'Answer text'
         )
         ->addColumn(
-            'status_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+            'status', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
                 'unsigned' => true,
                 'nullable' => false,
-            ), 'Status ID (1 - Answered, 2 - Not answered)'
+            ), 'Status (0 - Not answered, 1 - Answered)'
+        )
+        ->addColumn(
+            'sent_email', Varien_Db_Ddl_Table::TYPE_BOOLEAN, null, array(
+                'nullable' => false,
+                'default' => 0
+            ), 'Sent email'
         )
         ->setComment('User feedback question');
     $installer->getConnection()->createTable($table);

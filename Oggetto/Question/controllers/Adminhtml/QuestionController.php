@@ -1,6 +1,6 @@
 <?php
 /**
- * Oggetto Web sales extension for Magento
+ * Oggetto question extension for Magento
  *
  * NOTICE OF LICENSE
  *
@@ -17,7 +17,7 @@
  * please refer to http://www.magentocommerce.com for more information.
  *
  * @category  Oggetto
- * @package   Oggetto_Sales
+ * @package   Oggetto_Question
  * @copyright Copyright (C) 2014, Oggetto Web (http://oggettoweb.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -89,7 +89,7 @@ class Oggetto_Question_Adminhtml_QuestionController extends Mage_Adminhtml_Contr
                 $id ? $this->__('Edit Question') : $this->__('New Question'))
             ->_addContent(
                 $this->getLayout()
-                    ->createBlock('oggetto_question/adminhtml_question_edit')
+                    ->getBlock('oggetto_question_edit')
                     ->setData('action', $this->getUrl('*/*/save'))
             )
             ->renderLayout();
@@ -105,7 +105,7 @@ class Oggetto_Question_Adminhtml_QuestionController extends Mage_Adminhtml_Contr
         $model = Mage::getModel('question/question');
 
         if ($id) {
-            $model->load($id)->delete();
+            $model->setQuestionId($id)->delete();
         }
 
         $this->_redirect('*/*/');
@@ -141,7 +141,7 @@ class Oggetto_Question_Adminhtml_QuestionController extends Mage_Adminhtml_Contr
                     );
             }
 
-            Mage::getSingleton('adminhtml/session')->setBazData($postData);
+            Mage::getSingleton('adminhtml/session')->getQuestionData($postData);
             $this->_redirectReferer();
         }
     }
@@ -177,7 +177,7 @@ class Oggetto_Question_Adminhtml_QuestionController extends Mage_Adminhtml_Contr
             try {
                 $model = Mage::getModel('question/question');
                 foreach ($ids as $id) {
-                    $model->load($id)->delete();
+                    $model->setQuestionId($id)->delete();
                 }
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     $this->__(
@@ -207,7 +207,7 @@ class Oggetto_Question_Adminhtml_QuestionController extends Mage_Adminhtml_Contr
             try {
                 $model = Mage::getModel('question/question');
                 foreach ($ids as $id) {
-                    $model->load($id)->setStatusId($statusId)->save();
+                    $model->load($id)->setStatus($statusId)->save();
                 }
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     $this->__(

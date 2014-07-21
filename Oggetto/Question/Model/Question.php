@@ -1,6 +1,6 @@
 <?php
 /**
- * Oggetto Web sales extension for Magento
+ * Oggetto question extension for Magento
  *
  * NOTICE OF LICENSE
  *
@@ -17,7 +17,7 @@
  * please refer to http://www.magentocommerce.com for more information.
  *
  * @category  Oggetto
- * @package   Oggetto_Sales
+ * @package   Oggetto_Question
  * @copyright Copyright (C) 2014, Oggetto Web (http://oggettoweb.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -32,6 +32,12 @@
  */
 class Oggetto_Question_Model_Question extends Mage_Core_Model_Abstract
 {
+    protected $_eventPrefix = 'oggetto_question';
+
+    /**
+     * Question not answered status
+     */
+    const STATUS_NOT_ANSWERED = 0;
 
     /**
      * Question answered status
@@ -39,9 +45,14 @@ class Oggetto_Question_Model_Question extends Mage_Core_Model_Abstract
     const STATUS_ANSWERED = 1;
 
     /**
-     * Question not answered status
+     * Question not sent email
      */
-    const STATUS_NOT_ANSWERED = 2;
+    const SENT_EMAIL_NO = 0;
+
+    /**
+     * Question sent email
+     */
+    const SENT_EMAIL_YES = 1;
 
     /**
      * Get status array
@@ -53,6 +64,14 @@ class Oggetto_Question_Model_Question extends Mage_Core_Model_Abstract
         return array(
             self::STATUS_ANSWERED => 'Answered',
             self::STATUS_NOT_ANSWERED => 'Not answered'
+        );
+    }
+
+    static public function getYesnoArray()
+    {
+        return array(
+            self::SENT_EMAIL_YES => 'Yes',
+            self::SENT_EMAIL_NO => 'No'
         );
     }
 

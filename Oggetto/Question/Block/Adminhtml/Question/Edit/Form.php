@@ -1,6 +1,6 @@
 <?php
 /**
- * Oggetto Web sales extension for Magento
+ * Oggetto question extension for Magento
  *
  * NOTICE OF LICENSE
  *
@@ -17,7 +17,7 @@
  * please refer to http://www.magentocommerce.com for more information.
  *
  * @category  Oggetto
- * @package   Oggetto_Sales
+ * @package   Oggetto_Question
  * @copyright Copyright (C) 2014, Oggetto Web (http://oggettoweb.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -108,8 +108,8 @@ class Oggetto_Question_Block_Adminhtml_Question_Edit_Form
 
 
         $fieldset->addField(
-            'status_id', 'select', array(
-                'name'      => 'status_id',
+            'status', 'select', array(
+                'name'      => 'status',
                 'label'     => $this->__('Status'),
                 'title'     => $this->__('Status'),
                 'required'  => true,
@@ -125,6 +125,17 @@ class Oggetto_Question_Block_Adminhtml_Question_Edit_Form
                 'required'  => false,
             )
         );
+
+        $fieldset->addField(
+            'sent_email', 'select', array(
+                'name'      => 'sent_email',
+                'label'     => $this->__('Sent email'),
+                'title'     => $this->__('Sent email'),
+                'required'  => true,
+                'values' => Mage::getModel('question/question')->getYesnoArray()
+            )
+        );
+
 
         $form->setValues($model->getData());
         $form->setUseContainer(true);

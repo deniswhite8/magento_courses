@@ -45,11 +45,6 @@
         </helpers>
 
         <blocks>
-            <question>
-                <rewrite>
-                    <question>Oggetto_Question_Block_Form</question>
-                </rewrite>
-            </question>
 
             <oggetto_question>
                 <class>Oggetto_Question_Block</class>
@@ -83,6 +78,38 @@
                 </connection>
             </question_setup>
         </resources>
+
+        <events>
+            <sales_order_resource_init_virtual_grid_columns>
+                <observers>
+                    <add_columns_to_order>
+                        <type>singleton</type>
+                        <class>question/observer</class>
+                        <method>addColumnToResource</method>
+                    </add_columns_to_order>
+                </observers>
+            </sales_order_resource_init_virtual_grid_columns>
+
+            <oggetto_question_save_before>
+                <observers>
+                    <answer_send_email>
+                        <type>singleton</type>
+                        <class>question/observer</class>
+                        <method>questionSaveBefore</method>
+                    </answer_send_email>
+                </observers>
+            </oggetto_question_save_before>
+        </events>
+
+        <template>
+            <email>
+                <custom_template module="oggetto_question">
+                    <label>QA email</label>
+                    <file>oggetto_question/qa_email.html</file>
+                    <type>html</type>
+                </custom_template>
+            </email>
+        </template>
     </global>
 
     <admin>

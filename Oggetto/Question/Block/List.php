@@ -27,21 +27,44 @@
  *
  * @category   Oggetto
  * @package    Oggetto_Question
- * @subpackage Adminhtml
+ * @subpackage Block
  * @author     Denis Belov <dbelov@oggettoweb.com>
  */
-class Oggetto_Question_Block_Adminhtml_Question extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Oggetto_Question_Block_List extends Mage_Core_Block_Template
 {
+
+    /** @var Oggetto_Question_Model_Resource_Question_Collection */
+    private $_collection;
+
     /**
-     * Constructor
+     * Get question collection
      *
-     * @return Oggetto_Question_Block_Adminhtml_Question
+     * @return Mage_Core_Model_Resource_Db_Collection_Abstract
      */
-    public function __construct()
+    public function getQuestionCollection()
     {
-        $this->_blockGroup = 'oggetto_question';
-        $this->_controller = 'adminhtml_question';
-        $this->_headerText = $this->__('Question');
-        parent::__construct();
+        if (!$this->_collection) {
+            $this->_collection = Mage::getModel('question/question')->getCollection()
+                ->addFilter('status', Oggetto_Question_Model_Question::STATUS_ANSWERED)
+                ->setOrder('timestamp');
+        }
+
+        return $this->_collection;
+    }
+
+    /**
+     * Prepare layout
+     *
+     * @return Oggetto_Question_Block_List
+     */
+    protected function _prepareLayout()
+    {
+        parent::_prepareLayout();
+
+        $pager = $this->getLayout()->getBlock('question.pager');
+        $pager->setAvailableLimit(array(5 => 5));
+        $pager->setCollection($this->getQuestionCollection());
+
+        return $this;
     }
 }

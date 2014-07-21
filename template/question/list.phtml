@@ -1,0 +1,7 @@
+<?php foreach($this->getQuestionCollection() as $question): ?>
+    <div style="margin-bottom: 20px">
+        <p>Name: <?php echo $question->getName(); ?></p>
+        <p>Question: <?php echo $question->getText(); ?></p>
+        <p>Answer: <?php echo $question->getAnswer(); ?></p>
+    </div>
+<?php endforeach; ?>
