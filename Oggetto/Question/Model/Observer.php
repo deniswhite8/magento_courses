@@ -63,40 +63,7 @@ class Oggetto_Question_Model_Observer
         if ($question->getStatus() == Oggetto_Question_Model_Question::STATUS_ANSWERED &&
             $question->getSentEmail() == Oggetto_Question_Model_Question::SENT_EMAIL_NO) {
             $question->setSentEmail(Oggetto_Question_Model_Question::SENT_EMAIL_YES);
-            $this->sendEmail($question);
-            $question->save();
-        }
-    }
-
-    /**
-     * Send email with offer review
-     *
-     * @param Oggetto_Question_Model_Question $question Question
-     *
-     * @return void
-     */
-    public function sendEmail($question)
-    {
-        $email = $question->getEmail();
-        $name = $question->getName();
-
-        try {
-            $emailTemplate = Mage::getModel('core/email_template')->load(1);
-
-            $emailTemplateVariables = array(
-                'name' => $question->getName(),
-                'question' => $question->getText(),
-                'answer' => $question->getAnswer(),
-                'date' => $question->getTimestamp()
-            );
-
-            $from = 'general';
-            $emailTemplate->setSenderEmail(Mage::getStoreConfig("trans_email/ident_{$from}/email"));
-            $emailTemplate->setSenderName(Mage::getStoreConfig("trans_email/ident_{$from}/name"));
-            $emailTemplate->setType('html');
-            $emailTemplate->send($email, $name, $emailTemplateVariables);
-        } catch (Exception $e) {
-            Mage::logException($e);
+            Mage::getSingleton('question/emailSender')->sendQuestion($question);
         }
     }
 }

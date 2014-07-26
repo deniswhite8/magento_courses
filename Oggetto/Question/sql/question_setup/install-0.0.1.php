@@ -64,33 +64,6 @@ try {
     );
 
 
-    $select = $this->getConnection()->select();
-    $select->join(
-        array('address' => $this->getTable('sales/order_address')),
-        $this->getConnection()->quoteInto(
-            'address.parent_id = order_grid.entity_id AND address.address_type = ?',
-            Mage_Sales_Model_Quote_Address::TYPE_BILLING
-        ),
-        array('customer_telephone' => 'telephone')
-    );
-
-    $select->join(
-        array('order' => $this->getTable('sales/order')),
-        $this->getConnection()->quoteInto(
-            'order.entity_id = order_grid.entity_id',
-            Mage_Sales_Model_Quote_Address::TYPE_BILLING
-        ),
-        array('shipping_method' => 'shipping_method')
-    );
-
-    $this->getConnection()->query(
-        $select->crossUpdateFromSelect(
-            array('order_grid' => $this->getTable('sales/order_grid'))
-        )
-    );
-
-
-
     $table = $installer
         ->getConnection()
         ->newTable($installer->getTable('question/question'))
