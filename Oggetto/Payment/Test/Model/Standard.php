@@ -30,9 +30,8 @@
  * @subpackage Model
  * @author     Denis Belov <dbelov@oggettoweb.com>
  */
-class Oggetto_Payment_Test_Model_Standard extends EcomDev_PHPUnit_Test_Case
+class Oggetto_Payment_Test_Model_Standard extends EcomDev_PHPUnit_Test_Case_Controller
 {
-
     /**
      * Order place redirect url test
      *

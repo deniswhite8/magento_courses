@@ -36,6 +36,7 @@ class Oggetto_Payment_Model_Standard extends Mage_Payment_Model_Method_Abstract
     protected $_isInitializeNeeded = true;
     protected $_canUseInternal = false;
     protected $_canUseForMultishipping = false;
+    protected $_canCapture = true;
 
     /**
      * Return Order place redirect url

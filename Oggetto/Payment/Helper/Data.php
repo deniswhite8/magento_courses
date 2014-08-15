@@ -33,7 +33,7 @@
 class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /** @var Mage_Sales_Model_Order $_order */
-    protected $_order;
+    public $_order;
 
     protected $_params;
 
@@ -83,25 +83,6 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Validate order
-     *
-     * @param Mage_Sales_Model_Order $order Order
-     * @param string                 $hash  Hash
-     *
-     * @return Mage_Sales_Model_Order
-     */
-    public function validateOrder($order, $hash)
-    {
-        $_order = $this->_order;
-
-        $this->_order = $order;
-        $result = $this->getHash() === $hash;
-
-        $this->_order = $_order;
-        return $result;
-    }
-
-    /**
      * Get order items name
      *
      * @return string
@@ -111,10 +92,17 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
         $result = array();
 
         foreach ($this->getOrder()->getAllVisibleItems() as $orderItem) {
-            $result[] = $orderItem->getName();
+            $qty = round($orderItem->getQtyOrdered());
+            $qtyString = '';
+
+            if ($qty > 1) {
+                $qtyString = " ($qty)";
+            }
+
+            $result[] = $orderItem->getName() . $qtyString;
         }
 
-        return implode(',', $result);
+        return implode(', ', $result);
     }
 
     /**
@@ -167,7 +155,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
             $order = $this->getOrder();
             $this->_params = array(
                 'order_id' => $order->getEntityId(),
-                'total' => strtr($order->getBaseGrandTotal(), '.', ','),
+                'total' => $this->getOrderTotal($order),
                 'items' => $this->getOrderItemsName(),
                 'success_url' => $this->getSuccessUrl(),
                 'error_url' => $this->getFailureUrl(),
@@ -179,6 +167,17 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get order total formatted
+     *
+     * @param Mage_Sales_Model_Order $order Order
+     * @return array
+     */
+    public function getOrderTotal($order)
+    {
+        return strtr($order->getBaseGrandTotal(), '.', ',');
+    }
+
+    /**
      * Get params
      *
      * @return array
@@ -186,7 +185,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
     public function getParams()
     {
         $params = $this->getParamsWithoutHash();
-        $params['hash'] = $this->getHash();
+        $params['hash'] = $this->getHash($this->getParamsWithoutHash());
 
         return $params;
     }
@@ -194,11 +193,11 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get hash
      *
+     * @param array $params Params
      * @return string
      */
-    public function getHash()
+    public function getHash($params)
     {
-        $params = $this->getParamsWithoutHash();
         ksort($params);
 
         $joinParams = array();
@@ -208,6 +207,6 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
 
         $joinParams[] = $this->getSecretKey();
 
-        return md5(implode(',', $joinParams));
+        return md5(implode('|', $joinParams));
     }
 }

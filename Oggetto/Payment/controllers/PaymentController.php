@@ -61,38 +61,34 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
         $helper = Mage::helper('oggetto_payment/data');
 
         $request = $this->getRequest();
+
+        $hash = $request->getPost('hash');
+        $post = $request->getPost();
+        $params = array(
+            'status' => $post['status'],
+            'order_id' =>  $post['order_id'],
+            'total' => $post['total']
+        );
+
         $orderId = $request->getPost('order_id');
         $order = Mage::getModel('sales/order')->load($orderId);
 
-        if ($order->getEntityId() && $helper->validateOrder($order, $request->getPost('hash'))){
+        if ($order->getEntityId() != $orderId || $helper->getHash($params) != $hash
+            || $helper->getOrderTotal($order) != $post['total']) {
+            $this->_redirect('');
+            return;
+        }
+
+        if ($post['status']) {
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true, 'Gateway has authorized the payment.');
 
             $order->sendNewOrderEmail();
             $order->setEmailSent(true);
 
             $order->save();
-
-            Mage::getSingleton('checkout/session')->unsQuoteId();
-
-            $this->_redirectUrl($helper->getSuccessUrl());
         } else {
-            $this->cancel();
-            $this->_redirectUrl($helper->getFailureUrl());
-        }
-    }
-
-    /**
-     * The cancel action is triggered when an order is to be cancelled
-     *
-     * @return void
-     */
-    protected  function cancel()
-    {
-        $order = Mage::helper('oggetto_payment/data')->getOrder();
-
-        if ($order->getEntityId()) {
-            $order->cancel()->
-                setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway has declined the payment.')->save();
+            $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
+            $order->save();
         }
     }
 }

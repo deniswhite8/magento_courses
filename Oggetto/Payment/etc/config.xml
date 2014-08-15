@@ -72,4 +72,12 @@ please refer to http://www.magentocommerce.com for more information.
             </oggetto_payment>
         </routers>
     </frontend>
+
+    <phpunit>
+        <suite>
+            <modules>
+                <Oggetto_Payment />
+            </modules>
+        </suite>
+    </phpunit>
 </config>
