@@ -86,9 +86,13 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
             $order->setEmailSent(true);
 
             $order->save();
+
+            $order->getPayment()->capture()->save();
         } else {
             $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
             $order->save();
+
+            $order->getPayment()->cancel()->save();
         }
     }
 }

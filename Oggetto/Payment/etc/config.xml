@@ -45,6 +45,17 @@ please refer to http://www.magentocommerce.com for more information.
                 <class>Oggetto_Payment_Block</class>
             </oggetto_payment>
         </blocks>
+        <events>
+            <sales_order_save_after>
+                <observers>
+                    <add_invoice>
+                        <type>singleton</type>
+                        <class>oggetto_review/observer</class>
+                        <method>orderSaveBefore</method>
+                    </add_invoice>
+                </observers>
+            </sales_order_save_after>
+        </events>
     </global>
     <default>
         <payment>
