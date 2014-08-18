@@ -47,6 +47,18 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
     }
 
     /**
+     * Cancel action
+     *
+     * @return void
+     */
+    public function cancelAction()
+    {
+        $errorMessage = $this->getRequest()->getParam('message');
+        // processing $errorMessage ...
+        $this->_redirect('checkout/onepage/failure', array('_secure' => true));
+    }
+
+    /**
      * The response action is triggered when your gateway sends back a response after processing the customer's payment
      *
      * @return void
@@ -54,7 +66,7 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
     public function responseAction()
     {
         if (!$this->getRequest()->isPost()) {
-            $this->_redirect('');
+            $this->getResponse()->setHeader('HTTP/1.0', '400', true);
             return;
         }
         /** @var Oggetto_Payment_Helper_Data $helper */
@@ -75,13 +87,13 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
 
         if ($order->getEntityId() != $orderId || $helper->getHash($params) != $hash
             || $helper->getOrderTotal($order) != $post['total']) {
-            $this->_redirect('');
+            $this->getResponse()->setHeader('HTTP/1.0', '400', true);
             return;
         }
 
         $invoice = reset($order->getInvoiceCollection()->getItems());
 
-        if ($post['status']) {
+        if ($post['status'] == 1) {
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true, 'Gateway has authorized the payment.');
 
             $order->sendNewOrderEmail();
@@ -99,6 +111,7 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
             }
         }
 
+        $this->getResponse()->setHeader('HTTP/1.0', '200', true);
         $order->save();
     }
 }

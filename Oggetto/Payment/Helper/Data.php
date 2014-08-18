@@ -126,7 +126,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFailureUrl()
     {
         return Mage::getUrl(
-            'checkout/onepage/failure',
+            'oggetto_payment/payment/cancel',
             array('_secure' => true)
         );
     }
