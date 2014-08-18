@@ -38,11 +38,29 @@ class Oggetto_Payment_Model_Observer
      * @param Varien_Event_Observer $observer Observer object
      * @return void
      */
-    public function orderSaveBefore(Varien_Event_Observer $observer)
+    public function orderSaveAfter(Varien_Event_Observer $observer)
     {
-        $order = $observer->getEvent()->getObject();
-        if (...) {
-            $order->processInvoice();
+        $order = $observer->getEvent()->getOrder();
+        if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW &&
+            $order->getPayment()->getMethod() == Mage::getSingleton('oggetto_payment/standard')->getCode()) {
+            try {
+                if(!$order->canInvoice())
+                {
+                    Mage::throwException(Mage::helper('core')->__('Cannot create an invoice.'));
+                }
+                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+                if (!$invoice->getTotalQty()) {
+                    Mage::throwException(Mage::helper('core')->__('Cannot create an invoice without products.'));
+                }
+                $invoice->register();
+                $transactionSave = Mage::getModel('core/resource_transaction')
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder());
+                $transactionSave->save();
+            }
+            catch (Mage_Core_Exception $e) {
+                Mage::logException($e);
+            }
         }
     }
 }

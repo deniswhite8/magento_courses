@@ -66,7 +66,7 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
         $post = $request->getPost();
         $params = array(
             'status' => $post['status'],
-            'order_id' =>  $post['order_id'],
+            'order_id' => $post['order_id'],
             'total' => $post['total']
         );
 
@@ -85,14 +85,17 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
             $order->sendNewOrderEmail();
             $order->setEmailSent(true);
 
-            $order->save();
-
-            $order->getPayment()->capture()->save();
+            if ($order->hasCapture()) {
+                reset($order->getInvoiceCollection()->getItems())->capture()->save();
+            }
         } else {
             $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
-            $order->save();
 
-            $order->getPayment()->cancel()->save();
+            if ($order->hasCapture()) {
+                reset($order->getInvoiceCollection()->getItems())->cancel()->save();
+            }
         }
+
+        $order->save();
     }
 }

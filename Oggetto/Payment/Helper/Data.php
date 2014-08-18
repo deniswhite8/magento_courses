@@ -33,7 +33,7 @@
 class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /** @var Mage_Sales_Model_Order $_order */
-    public $_order;
+    protected $_order;
 
     protected $_params;
 
