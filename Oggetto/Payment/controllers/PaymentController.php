@@ -79,20 +79,23 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
             return;
         }
 
+        $invoice = reset($order->getInvoiceCollection()->getItems());
+
         if ($post['status']) {
             $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true, 'Gateway has authorized the payment.');
 
             $order->sendNewOrderEmail();
             $order->setEmailSent(true);
 
-            if ($order->hasCapture()) {
-                reset($order->getInvoiceCollection()->getItems())->capture()->save();
+
+            if ($invoice) {
+                $invoice->capture()->save();
             }
         } else {
             $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
 
-            if ($order->hasCapture()) {
-                reset($order->getInvoiceCollection()->getItems())->cancel()->save();
+            if ($invoice) {
+                $invoice->cancel()->save();
             }
         }
 
