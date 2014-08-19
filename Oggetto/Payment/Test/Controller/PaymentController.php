@@ -32,6 +32,30 @@
  */
 class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_Test_Case_Controller
 {
+
+    protected $_status;
+
+    /**
+     * Set up function
+     *
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $order = $this->getModelMock('sales/order', array('setState'));
+        $this->_status = null;
+
+        $order->expects($this->any())
+            ->method('setState')
+            ->will($this->returnCallback(function ($_status) {
+                $this->_status = $_status;
+            }));
+
+        $this->replaceByMock('model', 'sales/order', $order);
+    }
+
     /**
      * Test redirect action
      *
@@ -46,24 +70,13 @@ class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_
     }
 
     /**
-     * Test response action
+     * Test correct response action
      *
      * @return void
      */
-    public function testResponseAction()
+    public function testCorrectResponse()
     {
-        $order = $this->getModelMock('sales/order', array('setState'));
-        $status = null;
-
-        $order->expects($this->any())
-            ->method('setState')
-            ->will($this->returnCallback(function ($_status) use (&$status) {
-                $status = $_status;
-            }));
-
-        $this->replaceByMock('model', 'sales/order', $order);
-
-        // correct
+        $this->_status = null;
         $this->getRequest()->setMethod('POST')
             ->setPost('order_id', 241)
             ->setPost('status', 1)
@@ -73,10 +86,17 @@ class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_
         $this->dispatch('oggetto_payment/payment/response');
         $this->assertRequestRoute('oggetto_payment/payment/response');
 
-        $this->assertEquals(Mage_Sales_Model_Order::STATE_PROCESSING, $status);
+        $this->assertEquals(Mage_Sales_Model_Order::STATE_PROCESSING, $this->_status);
+    }
 
-        // hash error
-        $status = null;
+    /**
+     * Test hash incorrect response action
+     *
+     * @return void
+     */
+    public function testHashIncorrectResponse()
+    {
+        $this->_status = null;
         $this->getRequest()->setMethod('POST')
             ->setPost('order_id', 241)
             ->setPost('status', 1)
@@ -88,10 +108,17 @@ class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_
         $this->dispatch('oggetto_payment/payment/response');
         $this->assertRequestRoute('oggetto_payment/payment/response');
 
-        $this->assertEquals(0, $status);
+        $this->assertEquals(null, $this->_status);
+    }
 
-        // status error
-        $status = null;
+    /**
+     * Test status incorrect response action
+     *
+     * @return void
+     */
+    public function testStatusIncorrectResponse()
+    {
+        $this->_status = null;
         $this->getRequest()->setMethod('POST')
             ->setPost('order_id', 241)
             ->setPost('status', 0)
@@ -103,6 +130,6 @@ class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_
         $this->dispatch('oggetto_payment/payment/response');
         $this->assertRequestRoute('oggetto_payment/payment/response');
 
-        $this->assertEquals(Mage_Sales_Model_Order::STATE_CANCELED, $status);
+        $this->assertEquals(Mage_Sales_Model_Order::STATE_CANCELED, $this->_status);
     }
 }

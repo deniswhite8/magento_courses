@@ -57,7 +57,7 @@ class Oggetto_Payment_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case_Control
 
         $this->assertEquals(Mage::getUrl('checkout/onepage/success',
             array('_secure' => true)), $helper->getSuccessUrl());
-        $this->assertEquals(Mage::getUrl('checkout/onepage/failure',
+        $this->assertEquals(Mage::getUrl('oggetto_payment/payment/cancel/',
             array('_secure' => true)), $helper->getFailureUrl());
         $this->assertEquals(Mage::getUrl('oggetto_payment/payment/response',
             array('_secure' => true)), $helper->getReportUrl());
@@ -116,15 +116,15 @@ class Oggetto_Payment_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case_Control
         $this->assertEquals($orderIncId, $helper->getOrder()->getIncrementId());
         $this->assertEquals('456,789', $helper->getOrderTotal($helper->getOrder()));
         $this->assertEquals('lol, qwe (3)', $helper->getOrderItemsName());
-        $this->assertEquals('da9a9172f9294a9482fd80fd4bff2835', $helper->getHash($helper->getParamsWithoutHash()));
+        $this->assertEquals('44c897c41f7254705ee1d6a2efc0dc82', $helper->getHash($helper->getParamsWithoutHash()));
         $this->assertEquals(array(
             'order_id' => 241,
             'total' => '456,789',
             'items' => 'lol, qwe (3)',
             'success_url' => 'http://magento.local/checkout/onepage/success/',
-            'error_url' => 'http://magento.local/checkout/onepage/failure/',
+            'error_url' => 'http://magento.local/oggetto_payment/payment/cancel/',
             'payment_report_url' => 'http://magento.local/oggetto_payment/payment/response/',
-            'hash' => 'da9a9172f9294a9482fd80fd4bff2835'
+            'hash' => '44c897c41f7254705ee1d6a2efc0dc82'
         ), $helper->getParams());
     }
 }
