@@ -54,7 +54,7 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
     public function cancelAction()
     {
         $errorMessage = $this->getRequest()->getParam('message');
-        // processing $errorMessage ...
+        Mage::getSingleton('core/session')->addError($errorMessage);
         $this->_redirect('checkout/onepage/failure', array('_secure' => true));
     }
 
