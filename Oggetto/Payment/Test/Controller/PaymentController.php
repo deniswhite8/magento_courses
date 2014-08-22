@@ -32,28 +32,31 @@
  */
 class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_Test_Case_Controller
 {
-
-    protected $_status;
-
     /**
-     * Set up function
+     * Mock request handler model, with validation result
      *
+     * @param PHPUnit_Framework_MockObject_Stub $value Validation result
      * @return void
      */
-    protected function setUp()
+    protected function _mockRequestHandler($value)
     {
         parent::setUp();
 
-        $order = $this->getModelMock('sales/order', array('setState'));
-        $this->_status = null;
+        $requestHandler = $this->getModelMock('oggetto_payment/requestHandler', array('init', 'validate', 'process'));
 
-        $order->expects($this->any())
-            ->method('setState')
-            ->will($this->returnCallback(function ($_status) {
-                $this->_status = $_status;
-            }));
+        $requestHandler->expects($this->any())
+            ->method('init')
+            ->will($this->returnSelf());
 
-        $this->replaceByMock('model', 'sales/order', $order);
+        $requestHandler->expects($this->any())
+            ->method('validate')
+            ->will($value);
+
+        $requestHandler->expects($this->any())
+            ->method('process')
+            ->will($this->returnSelf());
+
+        $this->replaceByMock('model', 'oggetto_payment/requestHandler', $requestHandler);
     }
 
     /**
@@ -61,12 +64,12 @@ class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_
      *
      * @return void
      */
-    public function testRedirectAction()
+    public function testBlockInRedirectAction()
     {
         $this->dispatch('oggetto_payment/payment/redirect');
         $this->assertRequestRoute('oggetto_payment/payment/redirect');
         $this->assertEquals('oggetto_payment/redirect.phtml',
-            $this->getLayout()->getBlock('content')->getChild('gateway')->getTemplate());
+            $this->getLayout()->getBlock('root')->getTemplate());
     }
 
     /**
@@ -76,60 +79,40 @@ class Oggetto_Payment_Test_Controller_PaymentController extends EcomDev_PHPUnit_
      */
     public function testCorrectResponse()
     {
-        $this->_status = null;
-        $this->getRequest()->setMethod('POST')
-            ->setPost('order_id', 241)
-            ->setPost('status', 1)
-            ->setPost('total', '445,1300')
-            ->setPost('hash', 'f957d23c7d97d1960cd98931b4c3c0ee');
+        $this->_mockRequestHandler($this->returnValue(true));
 
         $this->dispatch('oggetto_payment/payment/response');
         $this->assertRequestRoute('oggetto_payment/payment/response');
 
-        $this->assertEquals(Mage_Sales_Model_Order::STATE_PROCESSING, $this->_status);
+        $this->assertResponseHttpCode(200);
     }
 
     /**
-     * Test hash incorrect response action
+     * Test incorrect response action
      *
      * @return void
      */
-    public function testHashIncorrectResponse()
+    public function testIncorrectResponse()
     {
-        $this->_status = null;
-        $this->getRequest()->setMethod('POST')
-            ->setPost('order_id', 241)
-            ->setPost('status', 1)
-            ->setPost('total', '445,1300')
-            ->setPost('hash', 'wtf');
-
-        Mage::unregister('_helper/oggetto_payment/data');
+        $this->_mockRequestHandler($this->returnValue(false));
 
         $this->dispatch('oggetto_payment/payment/response');
         $this->assertRequestRoute('oggetto_payment/payment/response');
 
-        $this->assertEquals(null, $this->_status);
+        $this->assertResponseHttpCode(400);
     }
 
     /**
-     * Test status incorrect response action
+     * Test system exception response action
      *
      * @return void
      */
-    public function testStatusIncorrectResponse()
+    public function testSystemExceptionResponse()
     {
-        $this->_status = null;
-        $this->getRequest()->setMethod('POST')
-            ->setPost('order_id', 241)
-            ->setPost('status', 0)
-            ->setPost('total', '445,1300')
-            ->setPost('hash', 'cf119b9a851b53a3ea5199f846c6d278');
-
-        Mage::unregister('_helper/oggetto_payment/data');
-
+        $this->_mockRequestHandler($this->throwException(new Mage_Exception('lol')));
         $this->dispatch('oggetto_payment/payment/response');
         $this->assertRequestRoute('oggetto_payment/payment/response');
 
-        $this->assertEquals(Mage_Sales_Model_Order::STATE_CANCELED, $this->_status);
+        $this->assertResponseHttpCode(500);
     }
 }

@@ -40,9 +40,6 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
     public function redirectAction()
     {
         $this->loadLayout();
-        $block = $this->getLayout()->createBlock('Mage_Core_Block_Template', 'gateway',
-            array('template' => 'oggetto_payment/redirect.phtml'));
-        $this->getLayout()->getBlock('content')->append($block);
         $this->renderLayout();
     }
 
@@ -65,53 +62,19 @@ class Oggetto_Payment_PaymentController extends Mage_Core_Controller_Front_Actio
      */
     public function responseAction()
     {
-        if (!$this->getRequest()->isPost()) {
-            $this->getResponse()->setHeader('HTTP/1.0', '400', true);
-            return;
-        }
-        /** @var Oggetto_Payment_Helper_Data $helper */
-        $helper = Mage::helper('oggetto_payment/data');
+        try {
+            $requestHandler = Mage::getModel('oggetto_payment/requestHandler');
+            $requestHandler->init($this->getRequest()->getPost());
 
-        $request = $this->getRequest();
-
-        $hash = $request->getPost('hash');
-        $post = $request->getPost();
-        $params = array(
-            'status' => $post['status'],
-            'order_id' => $post['order_id'],
-            'total' => $post['total']
-        );
-
-        $orderId = $request->getPost('order_id');
-        $order = Mage::getModel('sales/order')->load($orderId);
-
-        if ($order->getEntityId() != $orderId || $helper->getHash($params) != $hash
-            || $helper->getOrderTotal($order) != $post['total']) {
-            $this->getResponse()->setHeader('HTTP/1.0', '400', true);
-            return;
-        }
-
-        $invoice = reset($order->getInvoiceCollection()->getItems());
-
-        if ($post['status'] == 1) {
-            $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true, 'Gateway has authorized the payment.');
-
-            $order->sendNewOrderEmail();
-            $order->setEmailSent(true);
-
-
-            if ($invoice) {
-                $invoice->capture()->save();
+            if ($requestHandler->validate()) {
+                $requestHandler->process();
+                $this->getResponse()->setHttpResponseCode(200);
+            } else {
+                $this->getResponse()->setHttpResponseCode(400);
             }
-        } else {
-            $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
-
-            if ($invoice) {
-                $invoice->cancel()->save();
-            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+            $this->getResponse()->setHttpResponseCode(500);
         }
-
-        $this->getResponse()->setHeader('HTTP/1.0', '200', true);
-        $order->save();
     }
 }

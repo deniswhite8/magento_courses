@@ -32,6 +32,9 @@
  */
 class Oggetto_Payment_Model_RequestHandler extends Varien_Object
 {
+    const STATUS_OK = 1;
+    const STATUS_FAIL = 2;
+
     /**
      * Init handler
      *
@@ -46,8 +49,8 @@ class Oggetto_Payment_Model_RequestHandler extends Varien_Object
             'total' => $data['total']
         );
 
-        $this->setData($params);
-        $this->setData(array(
+        $this->addData($params);
+        $this->addData(array(
             'hash' => $data['hash'],
             'params' => $params,
             'order' => Mage::getModel('sales/order')->load($data['order_id'])
@@ -63,10 +66,55 @@ class Oggetto_Payment_Model_RequestHandler extends Varien_Object
     {
         $helper = Mage::helper('oggetto_payment/data');
         $order = $this->getOrder();
+        $status = $this->getStatus();
+
+        Mage::log(array(
+        $order->getId(),
+        $this->getOrderId(),
+        $helper->getHash($this->getParams()),
+        $this->getHash(),
+        $helper->getOrderTotal($order),
+        $this->getTotal(),
+        $status
+        ), 0, 'lol.log');
+
         if ($order->getId() == $this->getOrderId() && $helper->getHash($this->getParams()) == $this->getHash()
-            && $helper->getOrderTotal($order) == $this->getOrderTotal()) {
+            && $helper->getOrderTotal($order) == $this->getTotal() &&
+            ($status == self::STATUS_OK || $status == self::STATUS_FAIL)) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Process order
+     *
+     * @return void
+     */
+    public function process()
+    {
+        $order = $this->getOrder();
+        $invoice = $order->getInvoiceCollection()->getFirstItem();
+
+        Mage::log($this->getStatus(), 0, 'lol.log');
+        Mage::log(!!$invoice, 0, 'lol.log');
+
+        if ($this->getStatus() == self::STATUS_OK) {
+            if ($invoice) {
+                $invoice->capture()->save();
+            }
+
+            $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true, 'Gateway has authorized the payment.');
+
+            $order->sendNewOrderEmail();
+            $order->setEmailSent(true);
+        } else if ($this->getStatus() == self::STATUS_FAIL) {
+            if ($invoice) {
+                $invoice->cancel()->save();
+            }
+
+            $order->cancel()->setState(Mage_Sales_Model_Order::STATE_CANCELED, true, 'Gateway canceled the payment.');
+        }
+        $order->save();
     }
 }

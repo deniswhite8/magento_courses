@@ -154,7 +154,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$this->_params) {
             $order = $this->getOrder();
             $this->_params = array(
-                'order_id' => $order->getEntityId(),
+                'order_id' => $order->getId(),
                 'total' => $this->getOrderTotal($order),
                 'items' => $this->getOrderItemsName(),
                 'success_url' => $this->getSuccessUrl(),
@@ -174,7 +174,7 @@ class Oggetto_Payment_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getOrderTotal($order)
     {
-        return strtr($order->getBaseGrandTotal(), '.', ',');
+        return number_format($order->getBaseGrandTotal(), 2, ',', '');
     }
 
     /**

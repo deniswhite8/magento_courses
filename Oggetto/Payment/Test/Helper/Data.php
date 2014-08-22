@@ -32,6 +32,47 @@
  */
 class Oggetto_Payment_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case_Controller
 {
+
+    /**
+     * Set up function
+     *
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $orderIncId = 145000052;
+
+        $session = $this->getModelMock('checkout/session', array('getLastRealOrderId'));
+        $session->expects($this->any())
+            ->method('getLastRealOrderId')
+            ->will($this->returnValue($orderIncId));
+
+        $order = $this->getModelMock('sales/order', array('getAllVisibleItems', 'getBaseGrandTotal', 'getId'));
+        $order->expects($this->any())
+            ->method('getAllVisibleItems')
+            ->will($this->returnValue(array(
+                new Varien_Object(array(
+                    'qty_ordered' => 1,
+                    'name' => 'lol'
+                )),
+                new Varien_Object(array(
+                    'qty_ordered' => 3,
+                    'name' => 'qwe'
+                )),
+            )));
+        $order->expects($this->any())
+            ->method('getBaseGrandTotal')
+            ->will($this->returnValue(123.123));
+        $order->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(123));
+
+        $this->replaceByMock('singleton', 'checkout/session', $session);
+        $this->replaceByMock('model', 'sales/order', $order);
+    }
+
     /**
      * Test get config
      *
@@ -61,16 +102,6 @@ class Oggetto_Payment_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case_Control
             array('_secure' => true)), $helper->getFailureUrl());
         $this->assertEquals(Mage::getUrl('oggetto_payment/payment/response',
             array('_secure' => true)), $helper->getReportUrl());
-
-
-
-        $session = $this->getModelMock('checkout/session', array('getLastRealOrderId'));
-        $session->expects($this->any())
-            ->method('getLastRealOrderId')
-            ->will($this->returnValue(123));
-        $this->replaceByMock('singleton', 'checkout/session', $session);
-
-        $this->assertEquals(123, Mage::getSingleton('checkout/session')->getLastRealOrderId());
     }
 
     /**
@@ -81,50 +112,25 @@ class Oggetto_Payment_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case_Control
     public function testGetParams()
     {
         $helper = Mage::helper('oggetto_payment/data');
-        $orderIncId = 145000052;
 
-        $session = $this->getModelMock('checkout/session', array('getLastRealOrderId'));
+        $hash = md5(
+            "error_url:{$helper->getFailureUrl()}|" .
+            "items:lol, qwe (3)|" .
+            "order_id:123|" .
+            "payment_report_url:{$helper->getReportUrl()}|" .
+            "success_url:{$helper->getSuccessUrl()}|" .
+            "total:123,12|" .
+            $helper->getSecretKey()
+        );
 
-        $session->expects($this->any())
-            ->method('getLastRealOrderId')
-            ->will($this->returnValue($orderIncId));
-
-        $order = $this->getModelMock('sales/order', array('getAllVisibleItems', 'getBaseGrandTotal'));
-
-        $order->expects($this->any())
-            ->method('getAllVisibleItems')
-            ->will($this->returnValue(array(
-                new Varien_Object(array(
-                    'qty_ordered' => 1,
-                    'name' => 'lol'
-                )),
-                new Varien_Object(array(
-                    'qty_ordered' => 3,
-                    'name' => 'qwe'
-                )),
-            )));
-
-        $order->expects($this->any())
-            ->method('getBaseGrandTotal')
-            ->will($this->returnValue(456.789));
-
-        $this->replaceByMock('singleton', 'checkout/session', $session);
-        $this->replaceByMock('model', 'sales/order', $order);
-
-
-
-        $this->assertEquals($orderIncId, $helper->getOrder()->getIncrementId());
-        $this->assertEquals('456,789', $helper->getOrderTotal($helper->getOrder()));
-        $this->assertEquals('lol, qwe (3)', $helper->getOrderItemsName());
-        $this->assertEquals('44c897c41f7254705ee1d6a2efc0dc82', $helper->getHash($helper->getParamsWithoutHash()));
         $this->assertEquals(array(
-            'order_id' => 241,
-            'total' => '456,789',
+            'order_id' => 123,
+            'total' => '123,12',
             'items' => 'lol, qwe (3)',
-            'success_url' => 'http://magento.local/checkout/onepage/success/',
-            'error_url' => 'http://magento.local/oggetto_payment/payment/cancel/',
-            'payment_report_url' => 'http://magento.local/oggetto_payment/payment/response/',
-            'hash' => '44c897c41f7254705ee1d6a2efc0dc82'
+            'success_url' => $helper->getSuccessUrl(),
+            'error_url' => $helper->getFailureUrl(),
+            'payment_report_url' => $helper->getReportUrl(),
+            'hash' => $hash
         ), $helper->getParams());
     }
 }

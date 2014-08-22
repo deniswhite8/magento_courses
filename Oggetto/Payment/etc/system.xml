@@ -71,7 +71,7 @@ please refer to http://www.magentocommerce.com for more information.
                         </submit_url>
                         <secret_key>
                             <label>Api secret key</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
                             <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
