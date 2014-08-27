@@ -24,7 +24,7 @@ please refer to http://www.magentocommerce.com for more information.
 -->
 
 <layout version="0.1.0">
-    <default>
+    <oggetto_payment_payment_redirect>
         <block type="core/template" name="root" template="oggetto_payment/redirect.phtml" />
-    </default>
+    </oggetto_payment_payment_redirect>
 </layout>
