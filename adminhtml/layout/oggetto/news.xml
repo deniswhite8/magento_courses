@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_news_index>
+        <reference name="content">
+            <block type="oggetto_news/adminhtml_news" name="oggetto_news_news" />
+        </reference>
+    </adminhtml_news_index>
+
+    <adminhtml_news_edit>
+        <reference name="content">
+            <block type="oggetto_news/adminhtml_news_edit" name="oggetto_news_edit" />
+        </reference>
+    </adminhtml_news_edit>
+
+
+
+    <adminhtml_news_category_index>
+        <reference name="content">
+            <block type="oggetto_news/adminhtml_news_category" name="oggetto_news_news_category" />
+        </reference>
+    </adminhtml_news_category_index>
+
+    <adminhtml_news_category_edit>
+        <reference name="content">
+            <block type="oggetto_news/adminhtml_news_category_edit" name="oggetto_news_category_edit" />
+        </reference>
+    </adminhtml_news_category_edit>
+</layout>

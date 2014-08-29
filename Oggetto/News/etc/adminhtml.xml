@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<config>
+    <menu>
+        <catalog>
+            <children>
+                <oggetto_news_news translate="title" module="oggetto_news">
+                    <title>News</title>
+                    <action>adminhtml/news</action>
+                </oggetto_news_news>
+                <oggetto_news_category translate="title" module="oggetto_news">
+                    <title>News Categories</title>
+                    <action>adminhtml/news_category</action>
+                </oggetto_news_category>
+            </children>
+        </catalog>
+    </menu>
+
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <catalog>
+                        <children>
+                            <oggetto_news_news translate="title">
+                                <title>News</title>
+                            </oggetto_news_news>
+                            <oggetto_news_category translate="title">
+                                <title>News Categories</title>
+                            </oggetto_news_category>
+                        </children>
+                    </catalog>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

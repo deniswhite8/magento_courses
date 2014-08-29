@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+
+<config>
+    <modules>
+        <Oggetto_News>
+            <version>0.1.0</version>
+        </Oggetto_News>
+    </modules>
+
+    <frontend>
+        <routers>
+            <news>
+                <use>standard</use>
+                <args>
+                    <module>Oggetto_News</module>
+                    <frontName>news</frontName>
+                </args>
+            </news>
+        </routers>
+
+        <translate>
+            <modules>
+                <Oggetto_News>
+                    <files>
+                        <default>Oggetto_News.csv</default>
+                    </files>
+                </Oggetto_News>
+            </modules>
+        </translate>
+
+        <layout>
+            <updates>
+                <oggetto_news>
+                      <file>oggetto/news.xml</file>
+                </oggetto_news>
+            </updates>
+        </layout>
+    </frontend>
+
+    <global>
+        <helpers>
+            <oggetto_news>
+                <class>Oggetto_News_Helper</class>
+            </oggetto_news>
+        </helpers>
+
+        <blocks>
+            <oggetto_news>
+                <class>Oggetto_News_Block</class>
+            </oggetto_news>
+        </blocks>
+
+        <models>
+            <oggetto_news>
+                <class>Oggetto_News_Model</class>
+                <resourceModel>oggetto_news_resource</resourceModel>
+            </oggetto_news>
+
+            <oggetto_news_resource>
+                <class>Oggetto_News_Model_Resource</class>
+                <entities>
+                    <news>
+                        <table>oggetto_news</table>
+                    </news>
+                    <category>
+                        <table>oggetto_news_category</table>
+                    </category>
+                </entities>
+            </oggetto_news_resource>
+        </models>
+
+        <resources>
+            <oggetto_news_setup>
+                <setup>
+                    <module>Oggetto_News</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </oggetto_news_setup>
+        </resources>
+    </global>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Oggetto_News before="Mage_Adminhtml">Oggetto_News_Adminhtml</Oggetto_News>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <oggetto_news>
+                    <file>oggetto/news.xml</file>
+                </oggetto_news>
+            </updates>
+        </layout>
+    </adminhtml>
+</config>
